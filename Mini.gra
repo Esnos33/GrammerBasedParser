@@ -1,0 +1,19 @@
+// Simple Arithmetic Expression Grammar
+
+// Main expression structure
+Expr ::= Term (("+" | "-") Term)*
+       @ BuildExprNode;
+
+// Term in an expression
+Term ::= Factor (("*" | "/") Factor)*
+       @ BuildTermNode;
+
+// Factor can be a number, variable, or parenthesized expression
+Factor ::= Number | Variable | "(" Expr ")"
+         @ BuildFactorNode;
+
+// Generate lexer rules
+@lexer
+Number ::= [0-9]+ ("." [0-9]+)?;
+Variable ::= [a-zA-Z][a-zA-Z0-9_]*;
+Whitespace ::= [ \t\n\r]+ @Skip;

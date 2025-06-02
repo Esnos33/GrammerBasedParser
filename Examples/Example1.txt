@@ -1,0 +1,67 @@
+"""Przykład 1
+Expr ::= Term (("+" | "-") Term)*
+
+Rule
+  "Expr"
+  [Sequence[
+    ProductionSymbol (NonterminalSymbol "Term"),
+    Repeat(
+      Sequence[
+        Choice[
+          (ProductionSymbol (Terminal "+")),
+          (ProductionSymbol (Terminal "-"))],
+        ProductionSymbol (Nonterminal "Term")])]]
+"""
+
+"""Przykład 2
+Factor ::= Number | Variable | "(" Expr ")"
+
+Rule
+  "Factor"
+  (Choice[
+    (ProductionSymbol (Nonterminal "Number")),
+    (ProductionSymbol (Nonterminal "Variable")),
+    (Sequence[
+      (ProductionSymbol (Terminal "(")),
+      (ProductionSymbol (Nonterminal "Expr")),
+      (ProductionSymbol (Terminal ")"))])])
+"""
+
+"""Przykład 3
+Number :=: [0-9]+(\\.[0-9]+)?
+
+LexerRule
+  "Number"
+  "[0-9]+(\\.[0-9]+)?"
+"""
+
+"""Finałowy Przykład
+Expr ::= Term (("+" | "-") Term)*
+Factor ::= Number | Variable | "(" Expr ")"
+Number :=: [0-9]+(\\.[0-9]+)?
+
+
+Program[
+  Rule
+  "Expr"
+  [Sequence[
+    ProductionSymbol (NonterminalSymbol "Term"),
+    Repeat(
+      Sequence[
+        Choice[
+          (ProductionSymbol (Terminal "+")),
+          (ProductionSymbol (Terminal "-"))],
+        ProductionSymbol (Nonterminal "Term")])]],
+  Rule
+  "Factor"
+  (Choice[
+    (ProductionSymbol (Nonterminal "Number")),
+    (ProductionSymbol (Nonterminal "Variable")),
+    (Sequence[
+      (ProductionSymbol (Terminal "(")),
+      (ProductionSymbol (Nonterminal "Expr")),
+      (ProductionSymbol (Terminal ")"))])])]
+ [LexerRule
+  "Number"
+  "[0-9]+(\\.[0-9]+)?"]
+"""
