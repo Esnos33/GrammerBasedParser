@@ -1,15 +1,15 @@
 """Przykład 1
-Expr ::= Term (("+" | "-") Term)*
+Expr ::= [Term, ([("+" | "-"), Term])*]
 
 Rule
-  "Expr"
-  [Sequence[
+  "Expr"[
+  Sequence[
     ProductionSymbol (NonterminalSymbol "Term"),
     Repeat(
       Sequence[
-        Choice[
+        Choice
           (ProductionSymbol (Terminal "+")),
-          (ProductionSymbol (Terminal "-"))],
+          (ProductionSymbol (Terminal "-")),
         ProductionSymbol (Nonterminal "Term")])]]
 """
 

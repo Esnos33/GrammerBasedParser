@@ -7,104 +7,104 @@ import Text.Parsec.Error (ParseError)
 
 -- | Main function to parse a file
 main :: IO ()
-main = parseFile
+main = print "kapusta"
 
-parseFile :: IO ()
-parseFile = do
-  args <- getArgs
-  case args of
-    [fileName] -> do
-      contents <- readFile fileName
-      case parseGrammar contents of
-        Left err -> do
-          putStrLn "Parse error:"
-          print err
-        Right ast -> do
-          putStrLn "Successfully parsed program:"
-          print ast
-    _ -> putStrLn "Usage: parser <filename>"
+-- parseFile :: IO ()
+-- parseFile = do
+--   args <- getArgs
+--   case args of
+--     [fileName] -> do
+--       contents <- readFile fileName
+--       case parseGrammar contents of
+--         Left err -> do
+--           putStrLn "Parse error:"
+--           print err
+--         Right ast -> do
+--           putStrLn "Successfully parsed program:"
+--           print ast
+--     _ -> putStrLn "Usage: parser <filename>"
 
--- | Parse a string and print the result
-parseAndPrint :: String -> IO ()
-parseAndPrint input = do
-  putStrLn "Input:"
-  putStrLn input
-  putStrLn ""
-  putStrLn "Result:"
-  case parseGrammar input of
-    Left err -> print err
-    Right ast -> print ast
+-- -- | Parse a string and print the result
+-- parseAndPrint :: String -> IO ()
+-- parseAndPrint input = do
+--   putStrLn "Input:"
+--   putStrLn input
+--   putStrLn ""
+--   putStrLn "Result:"
+--   case parseGrammar input of
+--     Left err -> print err
+--     Right ast -> print ast
 
--- Example programs for testing
-examplePrograms :: [(String, String)]
-examplePrograms =
-  [ ("Simple Variable Declaration", "let x = 42;"),
-    ( "Basic Operations",
-      unlines
-        [ "let a = 10;",
-          "let b = 20;",
-          "let sum = a + b;",
-          "let diff = a - b;",
-          "let mod = a % b;"
-        ]
-    ),
-    ( "String Operations",
-      unlines
-        [ "let name = \"Alice\";",
-          "let greeting = \"Hello, \" ++ name;",
-          "print greeting;"
-        ]
-    ),
-    ( "Control Flow",
-      unlines
-        [ "let x = 10;",
-          "if x % 2 {",
-          "  print \"x is odd\";",
-          "} else {",
-          "  print \"x is even\";",
-          "};"
-        ]
-    ),
-    ( "Resource Management",
-      unlines
-        [ "declareResource \"resource1\";",
-          "declareResource \"resource2\";",
-          "lockAll [resource1, resource2] [r1, r2];",
-          "think 10;",
-          "unlockAll [r1, r2];"
-        ]
-    ),
-    ( "Process Spawning",
-      unlines
-        [ "spawn \"worker\" {",
-          "  loop {",
-          "    think (rand 10 50);",
-          "    print \"Worker is working\";",
-          "  };",
-          "};"
-        ]
-    ),
-    ( "Iteration",
-      unlines
-        [ "let sum = 0;",
-          "foreach 1 to 10 as i {",
-          "  let sum = sum + i;",
-          "};",
-          "print \"Sum: \" ++ sum;"
-        ]
-    )
-  ]
+-- -- Example programs for testing
+-- examplePrograms :: [(String, String)]
+-- examplePrograms =
+--   [ ("Simple Variable Declaration", "let x = 42;"),
+--     ( "Basic Operations",
+--       unlines
+--         [ "let a = 10;",
+--           "let b = 20;",
+--           "let sum = a + b;",
+--           "let diff = a - b;",
+--           "let mod = a % b;"
+--         ]
+--     ),
+--     ( "String Operations",
+--       unlines
+--         [ "let name = \"Alice\";",
+--           "let greeting = \"Hello, \" ++ name;",
+--           "print greeting;"
+--         ]
+--     ),
+--     ( "Control Flow",
+--       unlines
+--         [ "let x = 10;",
+--           "if x % 2 {",
+--           "  print \"x is odd\";",
+--           "} else {",
+--           "  print \"x is even\";",
+--           "};"
+--         ]
+--     ),
+--     ( "Resource Management",
+--       unlines
+--         [ "declareResource \"resource1\";",
+--           "declareResource \"resource2\";",
+--           "lockAll [resource1, resource2] [r1, r2];",
+--           "think 10;",
+--           "unlockAll [r1, r2];"
+--         ]
+--     ),
+--     ( "Process Spawning",
+--       unlines
+--         [ "spawn \"worker\" {",
+--           "  loop {",
+--           "    think (rand 10 50);",
+--           "    print \"Worker is working\";",
+--           "  };",
+--           "};"
+--         ]
+--     ),
+--     ( "Iteration",
+--       unlines
+--         [ "let sum = 0;",
+--           "foreach 1 to 10 as i {",
+--           "  let sum = sum + i;",
+--           "};",
+--           "print \"Sum: \" ++ sum;"
+--         ]
+--     )
+--   ]
 
--- | Function to run all example programs
-runExamples :: IO ()
-runExamples = do
-  putStrLn "Running example programs:"
-  mapM_
-    ( \(name, prog) -> do
-        putStrLn $ "\n=== " ++ name ++ " ==="
-        parseAndPrint prog
-    )
-    examplePrograms
+-- -- | Function to run all example programs
+-- runExamples :: IO ()
+-- runExamples = do
+--   putStrLn "Running example programs:"
+--   mapM_
+--     ( \(name, prog) -> do
+--         putStrLn $ "\n=== " ++ name ++ " ==="
+--         parseAndPrint prog
+--     )
+--     examplePrograms
 
 -- -- Simple unit test framework
 -- testParser :: IO ()
