@@ -80,7 +80,6 @@ parens = Tok.parens lexer
 whiteSpace :: Parser ()
 whiteSpace = Tok.whiteSpace lexer
 
--- commaSep :: Parser a -> Parser [a]
 commaSep :: Parser a -> Parser [a]
 commaSep = Tok.commaSep lexer
 
@@ -103,7 +102,7 @@ epsilonParser = do
   return Epsilon
 
 symbolParser :: Parser Symbol
-symbolParser = nonTerminalParser <|> terminalParser <|> epsilonParser
+symbolParser = epsilonParser <|> nonTerminalParser <|> terminalParser
 
 term :: Parser Production
 term =
