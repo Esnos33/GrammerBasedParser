@@ -1,1 +1,1 @@
-Test ::= epsilon
+Test ::= [Item1, Item2]*
