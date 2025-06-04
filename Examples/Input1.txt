@@ -1,0 +1,13 @@
+// Main expression structure
+// Expr ::= Number | [Expr , "term"]
+Expr ::= [Term, ([("+" | "-"), Term])*]
+// Generate lexer rules
+// Term ::= Factor (("*" | "/") Factor)*
+Term ::= [Factor, ([("*" | "/"), Factor])*]
+// Factor can be a number, variable, or parenthesized expression
+// Factor ::= Number | Variable | "(" Expr ")"
+Factor ::= Number | Variable | ["(", Expr, ")"]
+
+Number :=: "^[0-9]+(\\.[0-9]+)$?"
+Variable :=: "[a-zA-Z][a-zA-Z0-9_]*"
+Whitespace :=: "[ \t\n\r]+"

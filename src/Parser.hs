@@ -1,6 +1,6 @@
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Parser where
 
-import Data.Functor.Identity (Identity)
 import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Language (emptyDef)
@@ -8,6 +8,7 @@ import Text.Parsec.String (Parser)
 import Text.Parsec.Token (TokenParser)
 import Text.Parsec.Token qualified as Tok
 import Text.Regex.TDFA ((=~))
+import Data.Either (partitionEithers)
 
 testRegex :: IO ()
 testRegex = do
@@ -26,10 +27,7 @@ data Rule = Rule Nonterminal Production
   deriving (Show, Eq)
 
 -- A lexer rule defines a token pattern
-data LexerRule = LexerRule
-  { lexerName :: String, -- Name of the token (e.g. "Number")
-    lexerRegex :: String -- The regex/pattern (e.g. "[0-9]+")
-  }
+data LexerRule = LexerRule String String
   deriving (Show, Eq)
 
 -- A nonterminal symbol in the grammar
@@ -73,47 +71,45 @@ reservedOp = Tok.reservedOp lexer
 stringLiteral :: Parser String
 stringLiteral = Tok.stringLiteral lexer
 
-brackets :: Parser () -> Parser ()
+brackets :: Parser a -> Parser a
 brackets = Tok.brackets lexer
 
-parens :: Parser () -> Parser ()
+parens :: Parser a -> Parser a
 parens = Tok.parens lexer
 
 whiteSpace :: Parser ()
 whiteSpace = Tok.whiteSpace lexer
 
+-- commaSep :: Parser a -> Parser [a]
 commaSep :: Parser a -> Parser [a]
 commaSep = Tok.commaSep lexer
 
 symbol :: String -> Parser String
 symbol = Tok.symbol lexer
 
--- nonTerminalParser :: Parser Production
--- nonTerminalParser = do
---   name <- identifier
---   return $ ProductionSymbol $ NonterminalSymbol name
+nonTerminalParser :: Parser Symbol
+nonTerminalParser = do
+  name <- identifier
+  return $ NonterminalSymbol name
 
--- ternimalParser = do
---   name <- identifier
---   return $ Terminal name
+terminalParser :: Parser Symbol
+terminalParser = do
+  name <- stringLiteral
+  return $ TerminalSymbol name
 
--- term :: Parser Expr
--- term =
---     parens expr
---         <|> Var <$> identifier
---         <|> StringLit <$> stringLiteral
---         <|> IntLit <$> integer
---         <|> randExpr
+epsilonParser :: Parser Symbol
+epsilonParser = do
+  _ <- symbol "epsilon"
+  return Epsilon
 
--- symbolParser :: Parser Symbol
--- symbolParser =
---   NonterminalSymbol <$> identifier <|>
---   TerminalSymbol <$> (symbol "\"" *> identifier <* symbol "\"") <|>
---   pure Epsilon <* symbol "epsilon"
+symbolParser :: Parser Symbol
+symbolParser = nonTerminalParser <|> terminalParser <|> epsilonParser
 
-
-symbolParser :: Parser Production
-symbolParser = undefined
+term :: Parser Production
+term =
+  parens productionParser <|>
+  brackets (Sequence <$> commaSep productionParser) <|>
+  ProductionSymbol <$> symbolParser
 
 binary name fun assoc = Infix (do reservedOp name; return fun) assoc
 
@@ -122,7 +118,7 @@ prefix name fun = Prefix (do reservedOp name; return fun)
 postfix name fun = Postfix (do reservedOp name; return fun)
 
 productionParser :: Parser Production
-productionParser = buildExpressionParser operators symbolParser
+productionParser = buildExpressionParser operators term
   where
     operators =
       [ [postfix "*" Repeat],
@@ -144,38 +140,15 @@ lexerParser = do
   lx <- stringLiteral
   return $ LexerRule nt lx
 
+programParser :: Parser Program
 programParser = do
   whiteSpace
-  rules <- many ruleParser
-  lexers <- many lexerParser
+  items <- many (try (Left <$> ruleParser) <|> try (Right <$> lexerParser))
   eof
+  let (rules, lexers) = partitionEithers items
   return $ Program rules lexers
 
--- Przykładowy kod
--- Expr ::= Term (("+" | "-") Term)*
--- Factor ::= Number | Variable | "(" Expr ")"
--- Number :=: [0-9]+(\\.[0-9]+)?
---
--- Program[
---   Rule
---   "Expr"
---   [Sequence[
---     ProductionSymbol (NonterminalSymbol "Term"),
---     Repeat(
---       Sequence[
---         Choice[
---           (ProductionSymbol (Terminal "+")),
---           (ProductionSymbol (Terminal "-"))],
---         ProductionSymbol (Nonterminal "Term")])]],
---   Rule
---   "Factor"
---   (Choice[
---     (ProductionSymbol (Nonterminal "Number")),
---     (ProductionSymbol (Nonterminal "Variable")),
---     (Sequence[
---       (ProductionSymbol (Terminal "(")),
---       (ProductionSymbol (Nonterminal "Expr")),
---       (ProductionSymbol (Terminal ")"))])])]
---  [LexerRule
---   "Number"
---   "[0-9]+(\\.[0-9]+)?"]
+
+-- Parse a string into a Program
+parseProgram :: String -> Either ParseError Program
+parseProgram = parse programParser ""
